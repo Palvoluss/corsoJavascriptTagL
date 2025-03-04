@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Manipolazione del DOM - Esteso</title>
+    <style>
+        /* Stili di base per rendere la pagina un po' più carina */
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        #testo {
+            margin-top: 10px;
+            font-size: 18px;
+            color: #555;
+        }
+
+        /* Contenitore generale per organizzare i campi e i pulsanti */
+        .box {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* Campi di testo e input color */
+        input[type="text"],
+        input[type="color"] {
+            display: block;
+            margin: 10px 0;
+            padding: 6px;
+            font-size: 16px;
+        }
+
+        /* Pulsanti */
+        button {
+            padding: 8px 16px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-top: 5px;
+        }
+
+        button:hover {
+            background-color: #f0f0f0;
+        }
+
+        /* Messaggio di errore in rosso */
+        #errore {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Titolo originale, che modificheremo con un secondo bottone -->
+    <h1 id="titolo">Titolo originale</h1>
+
+    <!-- Paragrafo che verrà modificato dinamicamente -->
+    <p id="testo">Questo è un paragrafo statico.</p>
+
+    <!-- Div per mostrare un eventuale messaggio di errore (es. quando l'utente non inserisce testo) -->
+    <div id="errore"></div>
+
+    <div class="box">
+        <!-- Input per cambiare il contenuto del paragrafo -->
+        <label for="inputParagrafo" id="labelInputParagrafo">Testo per il paragrafo:</label>
+        <input type="text" id="inputParagrafo" placeholder="Scrivi il nuovo testo..." />
+
+        <!-- Bottone per applicare la modifica al paragrafo --> 
+        <button id="btnCambiaParagrafo">Cambia Paragrafo</button>
+    </div>
+
+    <div class="box">
+        <!-- Input per cambiare il titolo -->
+        <label for="inputTitolo">Testo per il titolo:</label>
+        <input type="text" id="inputTitolo" placeholder="Scrivi il nuovo titolo..." />
+
+        <!-- Bottone per applicare la modifica al titolo -->
+        <button id="btnCambiaTitolo">Cambia Titolo</button>
+    </div>
+
+    <div class="box">
+        <!-- Input di tipo color per scegliere la tonalità del paragrafo -->
+        <label for="colorPicker">Scegli il colore del paragrafo:</label>
+        <input type="color" id="colorPicker" value="#00ff00" />
+
+        <!-- Bottone per applicare il nuovo colore -->
+        <button id="btnCambiaColore">Cambia Colore Paragrafo</button>
+    </div>
+
+    <!-- Link al file JavaScript con la logica -->
+    <script src="script.js"></script>
+</body>
+
+</html>

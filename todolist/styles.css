@@ -1,0 +1,123 @@
+/* Reset e stile di base */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: #f9f9f9;
+    text-align: center;
+  }
+  
+  /* Stile del titolo principale */
+  h1 {
+    background-color: #4caf50;
+    color: #fff;
+    padding: 20px;
+    margin: 0;
+  }
+  
+  /* Contenitore dell'input e del bottone "Aggiungi" */
+  .input-container {
+    margin: 20px auto;
+    display: inline-block;
+  }
+  
+  #input-component {
+    padding: 8px 10px;
+    font-size: 16px;
+    width: 250px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: 6px;
+  }
+  
+  #add-task-button {
+    padding: 8px 14px;
+    font-size: 16px;
+    cursor: pointer;
+    background: #4caf50;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+  }
+  #add-task-button:hover {
+    background: #45a049;
+  }
+  
+  /* Contenitore delle task */
+  #task-holder {
+    max-width: 700px;
+    margin: 20px auto;
+    text-align: left;
+  }
+  
+  /* Singolo task - contenitore */
+  .task-item {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    margin: 10px 0;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+  }
+  
+  /* Testo della task */
+  .task-label {
+    flex-grow: 1;
+    font-size: 16px;
+    margin: 0 10px;
+  }
+  
+  /* Bottone "Fatto" */
+  .complete-btn {
+    background-color: #2196f3;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+    padding: 6px 10px;
+    margin-right: 6px;
+  }
+  .complete-btn:hover {
+    background-color: #0b7dda;
+  }
+  
+  /* Bottone "Rifiuta" */
+  .reject-btn {
+    background-color: #ff9800;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+    padding: 6px 10px;
+    margin-right: 6px;
+  }
+  .reject-btn:hover {
+    background-color: #e68a00;
+  }
+  
+  /* Bottone "Elimina" */
+  .delete-btn {
+    background-color: #f44336;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+    padding: 6px 10px;
+  }
+  .delete-btn:hover {
+    background-color: #da190b;
+  }
+  
+  /* Classe per i task completati */
+  .done {
+    background-color: #dff0d8; /* verde chiaro */
+    text-decoration: line-through;
+  }
+  
+  /* Classe per i task rifiutati */
+  .rejected {
+    background-color: #ffe2e2; /* rosso chiaro */
+    text-decoration: line-through;
+  }
+  

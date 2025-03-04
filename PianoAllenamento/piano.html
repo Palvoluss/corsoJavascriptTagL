@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <title>Piano di Allenamento - Visibilità Immediata</title>
+  <style>
+    /* Stili di base */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+    }
+    header {
+      background: #4CAF50;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+    }
+    main {
+      max-width: 1000px;
+      margin: 20px auto;
+      padding: 0 10px;
+    }
+
+    h1 {
+      margin-top: 0;
+    }
+
+    /* Stile per la sezione input */
+    .input-section {
+      background: #fff;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+    .input-section textarea {
+      width: 100%;
+      height: 150px;
+      font-family: monospace;
+      font-size: 14px;
+      margin: 10px 0;
+      padding: 8px;
+    }
+    .input-section button {
+      padding: 10px 18px;
+      font-size: 16px;
+      cursor: pointer;
+      background: #4CAF50;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+    }
+    .input-section button:hover {
+      background: #45a049;
+    }
+
+    /* Contenitore settimane e relativi allenamenti */
+    .weeks-container {
+      margin-bottom: 40px;
+    }
+
+    /* Ogni settimana avrà un titolo e un contenitore dei giorni */
+    .week {
+      background: #fff;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+    .week-header {
+      background: #eee;
+      padding: 15px 20px;
+      border-radius: 8px 8px 0 0;
+      border-bottom: 1px solid #ddd;
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .days-container {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 15px;
+    }
+
+    /* Scheda singolo giorno (allenamento) */
+    .day-card {
+      background: #fafafa;
+      width: 300px;
+      margin: 10px;
+      border-radius: 6px;
+      box-shadow: 0 0 6px rgba(0,0,0,0.05);
+      padding: 15px;
+      flex: 1 1 auto;
+    }
+    .day-title {
+      font-weight: bold;
+      margin-top: 0;
+      margin-bottom: 8px;
+      font-size: 16px;
+      color: #4CAF50;
+    }
+    .info-line {
+      margin: 4px 0;
+      line-height: 1.4;
+    }
+    .info-label {
+      font-weight: bold;
+      color: #333;
+    }
+    .info-value {
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Generatore Pianificazione Allenamenti</h1>
+  </header>
+
+  <main>
+
+    <!-- Sezione Input -->
+    <div class="input-section">
+      <p>Incolla qui il tuo piano di allenamento (testo grezzo) e clicca <strong>"Genera Pianificazione"</strong>:</p>
+      <textarea id="userInput"></textarea>
+      <button id="generateBtn">Genera Pianificazione</button>
+    </div>
+
+    <!-- Sezione in cui andremo a iniettare la struttura delle settimane e allenamenti -->
+    <div class="weeks-container" id="weeksContainer">
+      <!-- Popolato dinamicamente da JavaScript -->
+    </div>
+
+  </main>
+
+  <script>
+    /*********************************************************
+     * Struttura Attesa del Testo
+     * (tutto molto semplificato per la demo)
+     * 
+     * Esempi di linee che vengono cercate:
+     * 1) "Settimana 03/03 - 09/03 (Settimana di Carico)"
+     * 2) "Martedì 04/03"
+     * 3) "Categoria seduta: Corsa semplice"
+     *    "Sottocategoria seduta: Recupero attivo"
+     *    "Dettaglio: 10 km corsa facile..."
+     *    "Nota tecnica: Mantenere un ritmo..."
+     *    "Finalità: Recupero attivo"
+     *    "Durata complessiva: 50’"
+     *********************************************************/
+
+    // L'evento sul bottone: quando cliccato, parsifica e genera la vista
+    document.getElementById("generateBtn").addEventListener("click", () => {
+      const text = document.getElementById("userInput").value;
+      const planData = parsePlan(text);
+      renderPlan(planData);
+    });
+
+    /**
+     * parsePlan:
+     * - Prende una stringa multilinea (input dell'utente)
+     * - Restituisce un array di "settimane"
+     *   [
+     *     {
+     *       weekName: "03/03 - 09/03",
+     *       weekType: "Settimana di Carico",
+     *       days: [
+     *         {
+     *           date: "Martedì 04/03",
+     *           category: "...",
+     *           subCategory: "...",
+     *           detail: "...",
+     *           note: "...",
+     *           finalita: "...",
+     *           durata: "..."
+     *         },
+     *         ...
+     *       ]
+     *     },
+     *     ...
+     *   ]
+     */
+    function parsePlan(fullText) {
+      const lines = fullText.split('\n').map(line => line.trim()).filter(l => l);
+
+      const weeks = [];
+      let currentWeek = null;
+      let currentDay = null;
+
+      // Funzioni di utilità per riconoscere le righe
+      const isWeekLine = (line) => line.startsWith("Settimana ");
+      const isDayLine = (line) => {
+        // esempio: "Martedì 04/03"
+        // Controlliamo se inizia con un giorno della settimana e c'è una data
+        // Per semplicità, controlliamo se ci sono parole come "Lunedì", "Martedì", ... e la presenza di '/'
+        const daysOfWeek = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"];
+        return daysOfWeek.some(d => line.startsWith(d)) && line.includes('/');
+      };
+
+      // Scorri ogni riga e decidi cosa fare
+      for (let line of lines) {
+        if (isWeekLine(line)) {
+          // Esempio: "Settimana 03/03 - 09/03 (Settimana di Carico)"
+          // Cerchiamo di estrarre la parte "03/03 - 09/03" e "Settimana di Carico"
+          const reg = /^Settimana\s+(.+?)\s+\((.+)\)/;
+          const match = line.match(reg);
+          if (match) {
+            const dateRange = match[1].trim(); // "03/03 - 09/03"
+            const weekType = match[2].trim();  // "Settimana di Carico"
+            // Chiudi eventuale settimana aperta
+            if (currentWeek) weeks.push(currentWeek);
+            // Creane una nuova
+            currentWeek = {
+              weekName: dateRange,
+              weekType: weekType,
+              days: []
+            };
+          } else {
+            // Se non matcha, magari l'utente non ha usato le parentesi
+            // Tenteremo di interpretare in maniera generica
+            const noParentheses = line.replace("Settimana", "").trim();
+            currentWeek = {
+              weekName: noParentheses,
+              weekType: "",
+              days: []
+            };
+          }
+        } 
+        else if (isDayLine(line)) {
+          // Esempio: "Martedì 04/03"
+          // Chiudiamo eventuale day aperto
+          if (currentDay && currentWeek) {
+            currentWeek.days.push(currentDay);
+          }
+          currentDay = {
+            date: line,
+            category: "",
+            subCategory: "",
+            detail: "",
+            note: "",
+            finalita: "",
+            durata: ""
+          };
+        }
+        else {
+          // Cerchiamo di capire cos'è questa riga
+          // "Categoria seduta: "
+          if (line.startsWith("Categoria seduta:")) {
+            currentDay.category = line.replace("Categoria seduta:", "").trim();
+          } else if (line.startsWith("Sottocategoria seduta:")) {
+            currentDay.subCategory = line.replace("Sottocategoria seduta:", "").trim();
+          } else if (line.startsWith("Dettaglio:")) {
+            currentDay.detail = line.replace("Dettaglio:", "").trim();
+          } else if (line.startsWith("Nota tecnica:")) {
+            currentDay.note = line.replace("Nota tecnica:", "").trim();
+          } else if (line.startsWith("Finalità:")) {
+            currentDay.finalita = line.replace("Finalità:", "").trim();
+          } else if (line.startsWith("Durata complessiva:")) {
+            currentDay.durata = line.replace("Durata complessiva:", "").trim();
+          }
+        }
+      }
+
+      // Alla fine, se c'è una settimana o un giorno non chiuso, chiudiamoli
+      if (currentDay && currentWeek) {
+        currentWeek.days.push(currentDay);
+      }
+      if (currentWeek) {
+        weeks.push(currentWeek);
+      }
+
+      return weeks;
+    }
+
+    /**
+     * renderPlan:
+     * Dato l'array weeks generato da parsePlan,
+     * crea gli elementi HTML e li inietta nella pagina
+     */
+    function renderPlan(weeks) {
+      const container = document.getElementById("weeksContainer");
+      container.innerHTML = ""; // Svuota eventuale contenuto precedente
+
+      if (!weeks.length) {
+        container.innerHTML = "<p>Nessuna settimana trovata. Controlla il formato del testo.</p>";
+        return;
+      }
+
+      weeks.forEach(week => {
+        // Crea un div per la settimana
+        const weekDiv = document.createElement("div");
+        weekDiv.classList.add("week");
+
+        // Header della settimana
+        const weekHeader = document.createElement("div");
+        weekHeader.classList.add("week-header");
+        weekHeader.textContent = `Settimana ${week.weekName} (${week.weekType})`;
+        weekDiv.appendChild(weekHeader);
+
+        // Contenitore giorni
+        const daysContainer = document.createElement("div");
+        daysContainer.classList.add("days-container");
+
+        // Per ogni giorno...
+        week.days.forEach(day => {
+          const dayCard = document.createElement("div");
+          dayCard.classList.add("day-card");
+
+          // Titolo data
+          const dayTitle = document.createElement("h3");
+          dayTitle.classList.add("day-title");
+          dayTitle.textContent = day.date;
+          dayCard.appendChild(dayTitle);
+
+          // Info - Category
+          if (day.category) {
+            const pCat = createInfoLine("Categoria:", day.category);
+            dayCard.appendChild(pCat);
+          }
+          // Info - SubCategory
+          if (day.subCategory) {
+            const pSubCat = createInfoLine("Sottocategoria:", day.subCategory);
+            dayCard.appendChild(pSubCat);
+          }
+          // Info - Dettaglio
+          if (day.detail) {
+            const pDet = createInfoLine("Dettaglio:", day.detail);
+            dayCard.appendChild(pDet);
+          }
+          // Info - Nota
+          if (day.note) {
+            const pNote = createInfoLine("Nota tecnica:", day.note);
+            dayCard.appendChild(pNote);
+          }
+          // Info - Finalità
+          if (day.finalita) {
+            const pFin = createInfoLine("Finalità:", day.finalita);
+            dayCard.appendChild(pFin);
+          }
+          // Info - Durata
+          if (day.durata) {
+            const pDur = createInfoLine("Durata:", day.durata);
+            dayCard.appendChild(pDur);
+          }
+
+          daysContainer.appendChild(dayCard);
+        });
+
+        weekDiv.appendChild(daysContainer);
+        container.appendChild(weekDiv);
+      });
+    }
+
+    /**
+     * Crea un paragrafo con label + value
+     * es. "Categoria: Corsa semplice"
+     */
+    function createInfoLine(label, value) {
+      const p = document.createElement("p");
+      p.classList.add("info-line");
+      p.innerHTML = `<span class="info-label">${label}</span> <span class="info-value">${value}</span>`;
+      return p;
+    }
+  </script>
+</body>
+</html>
